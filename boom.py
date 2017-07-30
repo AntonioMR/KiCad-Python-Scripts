@@ -6,7 +6,7 @@ class Boom:
     def crear(self, fichero):
     	""" Crea un diccionario con los valores y referencias del ficher netlist especificado como parametro """
         try:
-            with open(file=fichero, mode='r') as f:
+            with open(name=fichero, mode='r') as f:
                 linea_anterior = False
                 for linea in f:
                     if '(comp (ref' in linea:
