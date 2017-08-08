@@ -15,9 +15,32 @@ class Position:
     def __str__(self):
         return " ".join((str(self.x), str(self.y)))
 
+class Segmento:
+    """docstring for Segmento"""
+    def __init__(self, inicio=(0.0,0.0), fin=(0.0,0.0)):
+        self.inicio = Position(position = inicio)
+        self.fin = Position(position = fin)
+
+    def setInicio(self, pos):
+        self.inicio.setPos(position = pos)
+
+    def setFin(self, pos):
+        self.fin.setPos(position = fin)
+
+    def getInicio(self):
+        return self.inicio.getPos()
+
+    def getFin(self):
+        return self.fin.getPos()
+
+    def getModulo(self):
+        return math.sqrt((self.inicio.getPos()[0]-self.fin.getPos()[0])**2 + (self.inicio.getPos()[1]-self.fin.getPos()[1])**2)
+
+    def __str__(self):
+        return " ".join(("Segmento desde:", str(self.inicio), "hasta:", str(self.fin), "distancia:", str(self.getModulo())))
 
 class Pad:
-    
+
     def __init__(self, id=0, pos=(0.0,0.0), net="", componente=""):
         self.position = Position()
         self.id = id
@@ -82,17 +105,15 @@ class Componente():
     def __str__(self):
         return " ".join(("Component name:",self.nombre, "at pos:", str(self.position)))
 
-        
-
 class Net:
     def __init__(self):
         self.name = ""
         self.pads = []
         self.longitud = 0
+        self.segmentos = []
 
-    def set(self, name, pad_list = [], longitud=0):
+    def set(self, name, longitud=0):
         self.name = name
-        self.pads = pad_list
         self.longitud = longitud
 
     def addPad(self, pad):
@@ -110,9 +131,13 @@ class Net:
     def getPads(self):
         return self.pads
 
+    def addSegmento(self, seg):
+        self.segmentos.append(seg)
+
+    def getSegmentos(self):
+        return self.segmentos
+
     def __str__(self):
-        #return '\n'.join(" = ".join((str(net),str(legth)))   for net,legth in self.nets_length.items())
-        #return '\n'.join((("Net name:",self.name,"connected to")), ('\n'.join(("   pad",pad)) for pad in self.pads))
         return " ".join(("Net name:",self.name))
 
 
@@ -202,6 +227,7 @@ class Board:
                                 valores = linea.split(" ", )
                                 pad.setNet(valores[7])
                                 componente.addPad(pad)
+                                self.nets[int(valores[7])].addPad(pad)
                             
                             else:
                                 self.componentes.append(componente)
@@ -218,6 +244,8 @@ class Board:
 
                         distancia = math.sqrt((xi-xf)**2 + (yi-yf)**2)
 
+                        segmento = Segmento(inicio = (xi,yi), fin = (xf,yf))
+                        self.nets[net].addSegmento(segmento)
                         self.nets[net].setLongitud(self.nets[net].getLongitud() + distancia)
                                 
             
@@ -241,23 +269,15 @@ class Board:
             print componente
             for pad in componente.getPads():
                 print "     ", pad
-        """
-        for mod,val in self.modules.items():
-            pos = val[0]
-            pads = val[1]
-
-            print "modulo" , mod , "at pos:" , pos
-            for pad in pads:
-                pad_value = pad[0]
-                net = int(pad[1])
-                print "     pad at pos:", pad_value , "connected to net", self.nets[net] 
-"""
    
     def printNets(self):
         for net in self.nets:
             print net
             for pad in net.getPads():
                 print "     with pad at", pad.getPos(), "from component", pad.getComponente()
+
+            for segmento in net.getSegmentos():
+                print "    ", segmento
 
     def __str__(self):
         return "str"
