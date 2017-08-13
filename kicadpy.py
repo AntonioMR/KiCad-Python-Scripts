@@ -142,11 +142,66 @@ def setModuleRefParam(refParam):
     pcb = pcbnew.GetBoard()
 
     for modulo in pcb.GetModules():
-        if modulo.IsSelected:
+        if modulo.IsSelected():
             modulo.Reference().SetTextHeight(refParam[0])
             modulo.Reference().SetTextWidth(refParam[1])
             modulo.Reference().SetThickness(refParam[2])
             modulo.Reference().SetPos0(refParam[3])
+
+def setModuleValSize(ancho=0, alto=0, grosor=0, all=False):
+    pcb = pcbnew.GetBoard()
+
+    modulos = pcb.GetModules()
+
+    for modulo in modulos:
+        if all or modulo.IsSelected():
+            value = modulo.Value()
+            if ancho != 0:
+                value.SetTextWidth(int(ancho * ESCALA))
+            if alto != 0:
+                value.SetTextHeight(int(alto * ESCALA))
+            if grosor != 0:
+                value.SetThickness(int(grosor * ESCALA))
+
+def setModuleValPos(xPos=0, yPos=0, all=False):
+    pcb = pcbnew.GetBoard()
+
+    modulos = pcb.GetModules()
+
+    for modulo in modulos:
+        if all or modulo.IsSelected():
+            modulo.Value().SetPos0(pcbnew.wxPoint(int(xPos*ESCALA),int(yPos*ESCALA)))
+            
+        
+
+def getModuleValParam(modulo="", selected=True):
+    pcb = pcbnew.GetBoard()
+    
+    if selected == True:
+        for modulo in pcb.GetModules():
+            if modulo.IsSelected():
+                refHeight = modulo.Value().GetTextHeight()
+                refWidth = modulo.Value().GetTextWidth()
+                refThick = modulo.Value().GetThickness()
+                refPos = modulo.Value().GetPos0()
+                return (refHeight,refWidth,refThick,refPos)
+    else:
+        modulo = pcb.FindModuleByReference(modulo)
+        refHeight = modulo.Value().GetTextHeight()
+        refWidth = modulo.Value().GetTextWidth()
+        refThick = modulo.Value().GetThickness()
+        refPos = modulo.Value().GetPos0()
+        return (refHeight,refWidth,refThick,refPos)
+
+def setModuleValParam(valParam):
+    pcb = pcbnew.GetBoard()
+
+    for modulo in pcb.GetModules():
+        if modulo.IsSelected():
+            modulo.Value().SetTextHeight(valParam[0])
+            modulo.Value().SetTextWidth(valParam[1])
+            modulo.Value().SetThickness(valParam[2])
+            modulo.Value().SetPos0(valParam[3])
 
 def lockModules(opcion=True):
     pcb = pcbnew.GetBoard()
