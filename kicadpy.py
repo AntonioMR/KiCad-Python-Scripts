@@ -7,7 +7,8 @@ import pcbnew
 ESCALA = 1000000.0
 
 def listaPads(modulo=""):
-    
+    """ Imprime por consola la lista de pads de un determinado modulo cuya referencia
+        Se pasa como parametro"""
     pcb = pcbnew.GetBoard()
     modules = pcb.GetModules()
 
@@ -17,7 +18,8 @@ def listaPads(modulo=""):
                 print ("    Pad {} conectado a nodo {}".format(pad.GetPadName(),pad.GetNet().GetNetname()))
 
 def nodosComunes(modulo1="", modulo2=""):
-    
+    """ Imprime los nodos comunes entre los dos modulos cuyas referencias se pasan como
+        parametro, indicando los pad mediante los que se conectan los modulos """
     mod1Nets = []
     mod2Nets = []
 
@@ -48,6 +50,7 @@ def nodosComunes(modulo1="", modulo2=""):
     return nodos
 
 def dimension():
+    """ Imprime las dimensiones del la pcb (en revision)"""
     pcb = pcbnew.GetBoard()
     pcbX = pcb.ComputeBoundingBox().GetX()
     pcbY = pcb.ComputeBoundingBox().GetY()
@@ -57,6 +60,9 @@ def dimension():
     print ("pcb situada en {},{} de largo {} mm y ancho {} mm".format(pcbX/ESCALA, pcbY/ESCALA, pcbWidth/ESCALA, pcbHeight/ESCALA))
 
 def distancia(modulo1, modulo2, net="ALL"):
+    """ Imprime los nodos comunes entre los dos modulos cuyas referencias se pasan como
+        parametro, indicando los pad mediante los que se conectan los modulos y la distancia
+        del nodo que los interconecta (en reficion) """
 
     mod1Nets = []
     mod2Nets = []
@@ -93,6 +99,12 @@ def distancia(modulo1, modulo2, net="ALL"):
                 print ("    de longitud {}".format(longitud/ESCALA))
 
 def setModuleRefSize(ancho=0, alto=0, grosor=0, all=False, allLikeThis=False):
+    """ Fija el tamaño del texto del campo Referencia de los modulos segun los parametros especificados.
+        Si algun parametro no se indica, o se indica a 0, no se cambiara. 
+        Pasando el parametro all a True se cambiaran en todos los modulos. 
+        Pasando el parametro allLikeThis a True se cambiaran todos los modulos iguales al modulo
+        seleccionado en la pcb """
+
     pcb = pcbnew.GetBoard()
 
     modulos = pcb.GetModules()
@@ -114,6 +126,12 @@ def setModuleRefSize(ancho=0, alto=0, grosor=0, all=False, allLikeThis=False):
                 ref.SetThickness(int(grosor * ESCALA))
 
 def setModuleRefPos(xPos=0, yPos=0, all=False, allLikeThis=False):
+    """ Fija la posicion del texto del campo Referencia de los modulos segun los parametros especificados.
+        Si algun parametro no se indica, o se indica a 0, no se cambiara. 
+        Pasando el parametro all a True se cambiaran en todos los modulos. 
+        Pasando el parametro allLikeThis a True se cambiaran todos los modulos iguales al modulo
+        seleccionado en la pcb """
+
     pcb = pcbnew.GetBoard()
 
     modulos = pcb.GetModules()
@@ -128,9 +146,11 @@ def setModuleRefPos(xPos=0, yPos=0, all=False, allLikeThis=False):
         if all or modulo.IsSelected() or (allLikeThis and (modulo.GetDescription() == descripcion)):
             ref = modulo.Reference().SetPos0(pcbnew.wxPoint(int(xPos*ESCALA),int(yPos*ESCALA)))
             
-        
-
 def getModuleRefParam(modulo="", selected=True):
+    """ Obtiene los parametros de configuracion del campo Referencia para un modulo.
+        por defecto lo obtendra del modulo seleccionado en la pcb
+        Es posible indicar la referencia del modulo a capturar mediante el parametro modulo,
+        en cuyo caso habra que indicar el parametro selected a False """
     pcb = pcbnew.GetBoard()
     
     if selected == True:
@@ -151,6 +171,12 @@ def getModuleRefParam(modulo="", selected=True):
         return (refHeight,refWidth,refThick,refPos)
 
 def setModuleRefParam(refParam, allLikeThis=False):
+    """ Modifica los valores de configuracion del campo Referencia de un modulo con los valores
+        capturados previamente con la funcion getModuleRefParam().
+        Por defecto modifica todos los modulos seleccionados 
+        Si se indica el parametro allLikeThis = True se modificaran todos los modulos iguales 
+        que el modulo seleccionado. """
+
     pcb = pcbnew.GetBoard()
 
     if allLikeThis:
@@ -167,6 +193,11 @@ def setModuleRefParam(refParam, allLikeThis=False):
             modulo.Reference().SetPos0(refParam[3])
 
 def setModuleValSize(ancho=0, alto=0, grosor=0, all=False, allLikeThis=False):
+    """ Fija el tamaño del texto del campo Valor de los modulos segun los parametros especificados.
+        Si algun parametro no se indica, o se indica a 0, no se cambiara. 
+        Pasando el parametro all a True se cambiaran en todos los modulos. 
+        Pasando el parametro allLikeThis a True se cambiaran todos los modulos iguales al modulo
+        seleccionado en la pcb """
     pcb = pcbnew.GetBoard()
 
     modulos = pcb.GetModules()
@@ -188,6 +219,11 @@ def setModuleValSize(ancho=0, alto=0, grosor=0, all=False, allLikeThis=False):
                 value.SetThickness(int(grosor * ESCALA))
 
 def setModuleValPos(xPos=0, yPos=0, all=False, allLikeThis):
+    """ Fija la posicion del texto del campo Valor de los modulos segun los parametros especificados.
+        Si algun parametro no se indica, o se indica a 0, no se cambiara. 
+        Pasando el parametro all a True se cambiaran en todos los modulos. 
+        Pasando el parametro allLikeThis a True se cambiaran todos los modulos iguales al modulo
+        seleccionado en la pcb """
     pcb = pcbnew.GetBoard()
 
     modulos = pcb.GetModules()
@@ -200,11 +236,13 @@ def setModuleValPos(xPos=0, yPos=0, all=False, allLikeThis):
 
     for modulo in modulos:
         if all or modulo.IsSelected() or (allLikeThis and (modulo.GetDescription() == descripcion)):
-            modulo.Value().SetPos0(pcbnew.wxPoint(int(xPos*ESCALA),int(yPos*ESCALA)))
-            
+            modulo.Value().SetPos0(pcbnew.wxPoint(int(xPos*ESCALA),int(yPos*ESCALA)))    
         
-
 def getModuleValParam(modulo="", selected=True):
+    """ Obtiene los parametros de configuracion del campo Valor para un modulo.
+        por defecto lo obtendra del modulo seleccionado en la pcb
+        Es posible indicar la referencia del modulo a capturar mediante el parametro modulo,
+        en cuyo caso habra que indicar el parametro selected a False """
     pcb = pcbnew.GetBoard()
     
     if selected == True:
@@ -224,6 +262,11 @@ def getModuleValParam(modulo="", selected=True):
         return (refHeight,refWidth,refThick,refPos)
 
 def setModuleValParam(valParam, allLikeThis=False):
+    """ Modifica los valores de configuracion del campo Valor de un modulo con los valores
+        capturados previamente con la funcion getModuleValParam().
+        Por defecto modifica todos los modulos seleccionados 
+        Si se indica el parametro allLikeThis = True se modificaran todos los modulos iguales 
+        que el modulo seleccionado. """
     pcb = pcbnew.GetBoard()
     
     if allLikeThis:
@@ -240,6 +283,7 @@ def setModuleValParam(valParam, allLikeThis=False):
             modulo.Value().SetPos0(valParam[3])
 
 def lockModules(opcion=True):
+    """ Bloquea/desbloquea todos los modulos en la pcb dependiendo del valor pasado como parametro"""
     pcb = pcbnew.GetBoard()
 
     modulos = pcb.GetModules()
@@ -248,4 +292,5 @@ def lockModules(opcion=True):
         modulo.SetLocked(opcion)
 
 def lockNets(opcion=True):
+    """ Bloquea/desbloquea todas las pistas en la pcb dependiendo del valor pasado como parametro (en revision)"""
     pass
