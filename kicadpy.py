@@ -90,15 +90,21 @@ def distancia(modulo1, modulo2, net="ALL"):
 
                 for track in tracks:
                     longitud += track.GetLength()
-                print ("    de longitud {}".format(longitud))
+                print ("    de longitud {}".format(longitud/ESCALA))
 
-def setModuleRefSize(ancho=0, alto=0, grosor=0, all=False):
+def setModuleRefSize(ancho=0, alto=0, grosor=0, all=False, allLikeThis=False):
     pcb = pcbnew.GetBoard()
 
     modulos = pcb.GetModules()
 
+    if allLikeThis:
+        for modulo in modulos:
+            if modulo.IsSelected():
+                descripcion = modulo.GetDescription()
+                break
+
     for modulo in modulos:
-        if all or modulo.IsSelected():
+        if all or modulo.IsSelected() or (allLikeThis and (modulo.GetDescription() == descripcion)):
             ref = modulo.Reference()
             if ancho != 0:
                 ref.SetTextWidth(int(ancho * ESCALA))
@@ -107,13 +113,19 @@ def setModuleRefSize(ancho=0, alto=0, grosor=0, all=False):
             if grosor != 0:
                 ref.SetThickness(int(grosor * ESCALA))
 
-def setModuleRefPos(xPos=0, yPos=0, all=False):
+def setModuleRefPos(xPos=0, yPos=0, all=False, allLikeThis=False):
     pcb = pcbnew.GetBoard()
 
     modulos = pcb.GetModules()
 
+    if allLikeThis:
+        for modulo in modulos:
+            if modulo.IsSelected():
+                descripcion = modulo.GetDescription()
+                break
+
     for modulo in modulos:
-        if all or modulo.IsSelected():
+        if all or modulo.IsSelected() or (allLikeThis and (modulo.GetDescription() == descripcion)):
             ref = modulo.Reference().SetPos0(pcbnew.wxPoint(int(xPos*ESCALA),int(yPos*ESCALA)))
             
         
@@ -138,23 +150,35 @@ def getModuleRefParam(modulo="", selected=True):
         refPos = modulo.Reference().GetPos0()
         return (refHeight,refWidth,refThick,refPos)
 
-def setModuleRefParam(refParam):
+def setModuleRefParam(refParam, allLikeThis=False):
     pcb = pcbnew.GetBoard()
 
+    if allLikeThis:
+        for modulo in modulos:
+            if modulo.IsSelected():
+                descripcion = modulo.GetDescription()
+                break
+
     for modulo in pcb.GetModules():
-        if modulo.IsSelected():
+        if modulo.IsSelected() or (allLikeThis and (modulo.GetDescription() == descripcion)):
             modulo.Reference().SetTextHeight(refParam[0])
             modulo.Reference().SetTextWidth(refParam[1])
             modulo.Reference().SetThickness(refParam[2])
             modulo.Reference().SetPos0(refParam[3])
 
-def setModuleValSize(ancho=0, alto=0, grosor=0, all=False):
+def setModuleValSize(ancho=0, alto=0, grosor=0, all=False, allLikeThis=False):
     pcb = pcbnew.GetBoard()
 
     modulos = pcb.GetModules()
 
+    if allLikeThis:
+        for modulo in modulos:
+            if modulo.IsSelected():
+                descripcion = modulo.GetDescription()
+                break
+
     for modulo in modulos:
-        if all or modulo.IsSelected():
+        if all or modulo.IsSelected() or (allLikeThis and (modulo.GetDescription() == descripcion)):
             value = modulo.Value()
             if ancho != 0:
                 value.SetTextWidth(int(ancho * ESCALA))
@@ -163,13 +187,19 @@ def setModuleValSize(ancho=0, alto=0, grosor=0, all=False):
             if grosor != 0:
                 value.SetThickness(int(grosor * ESCALA))
 
-def setModuleValPos(xPos=0, yPos=0, all=False):
+def setModuleValPos(xPos=0, yPos=0, all=False, allLikeThis):
     pcb = pcbnew.GetBoard()
 
     modulos = pcb.GetModules()
+    
+    if allLikeThis:
+        for modulo in modulos:
+            if modulo.IsSelected():
+                descripcion = modulo.GetDescription()
+                break
 
     for modulo in modulos:
-        if all or modulo.IsSelected():
+        if all or modulo.IsSelected() or (allLikeThis and (modulo.GetDescription() == descripcion)):
             modulo.Value().SetPos0(pcbnew.wxPoint(int(xPos*ESCALA),int(yPos*ESCALA)))
             
         
@@ -193,11 +223,17 @@ def getModuleValParam(modulo="", selected=True):
         refPos = modulo.Value().GetPos0()
         return (refHeight,refWidth,refThick,refPos)
 
-def setModuleValParam(valParam):
+def setModuleValParam(valParam, allLikeThis=False):
     pcb = pcbnew.GetBoard()
+    
+    if allLikeThis:
+        for modulo in modulos:
+            if modulo.IsSelected():
+                descripcion = modulo.GetDescription()
+                break
 
     for modulo in pcb.GetModules():
-        if modulo.IsSelected():
+        if modulo.IsSelected() or (allLikeThis and (modulo.GetDescription() == descripcion)):
             modulo.Value().SetTextHeight(valParam[0])
             modulo.Value().SetTextWidth(valParam[1])
             modulo.Value().SetThickness(valParam[2])
